@@ -1,0 +1,14 @@
+option('enable_test',
+  type : 'boolean',
+  value : false,
+  description : 'Enable tests')
+
+option('enable_docs',
+  type : 'boolean',
+  value : false,
+  description : 'Generate documentation with doxygen')
+
+option('enable_graphs',
+  type : 'boolean',
+  value : false,
+  description : 'Enable doxygen to generate graphs using dot')

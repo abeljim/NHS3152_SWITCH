@@ -1,0 +1,26 @@
+drivers_src = files(
+  # 'nss/lib_board_dp/src/board.c',
+  'nss/lib_chip_nss/src/adcdac_nss.c',
+  'nss/lib_chip_nss/src/bussync_nss.c',
+  'nss/lib_chip_nss/src/clock_nss.c',
+  'nss/lib_chip_nss/src/eeprom_nss.c',
+  'nss/lib_chip_nss/src/flash_nss.c',
+  'nss/lib_chip_nss/src/gpio_nss.c',
+  'nss/lib_chip_nss/src/i2c_nss.c',
+  'nss/lib_chip_nss/src/i2d_nss.c',
+  'nss/lib_chip_nss/src/iap_nss.c',
+  'nss/lib_chip_nss/src/iocon_nss.c',
+  'nss/lib_chip_nss/src/nfc_nss.c',
+  'nss/lib_chip_nss/src/pmu_nss.c',
+  'nss/lib_chip_nss/src/rtc_nss.c',
+  'nss/lib_chip_nss/src/ssp_nss.c',
+  'nss/lib_chip_nss/src/syscon_nss.c',
+  'nss/lib_chip_nss/src/timer_nss.c',
+  'nss/lib_chip_nss/src/tsen_nss.c',
+  'nss/lib_chip_nss/src/wwdt_nss.c',
+  'nss/mods/led/led.c',
+  'nss/mods/startup/startup.c',
+  'nss/mods/ndeft2t/ndeft2t.c'
+
+
+)

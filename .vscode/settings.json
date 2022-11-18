@@ -1,0 +1,6 @@
+{
+    "mesonbuild.configureOnOpen": false,
+    "files.associations": {
+        "adcdac_nss.h": "c"
+    }
+}
