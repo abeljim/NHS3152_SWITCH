@@ -7,9 +7,28 @@ removed warning for when there is no led defined, maybe not a good idea in long 
 wasnt a good idea long term had to change the file - porbably still a bad idea
 
 # TODO
-need to add some mods files to meson still 
+Need to add some mods files to meson still 
 
 # Note
-Planning on using
 Using picolibc as the libc implementation
-Install using the default settings for arme
+
+Install using the default settings for ARM
+
+# Use
+Currently on works on Linux - adding windows support is simple 
+
+Install meson and ninja 
+
+Install arm gcc 
+
+Install pyjLink
+
+Build using the ./build.sh 
+
+Cd into build/debug 
+
+Compile: ninja
+
+Clean: ninja clean
+
+Flash using Jlink: ninja flash
