@@ -14,6 +14,12 @@ Using picolibc as the libc implementation
 
 Install using the default settings for ARM
 
+# Windows Setup
+Install arm gcc
+install python 
+install meson using pip
+install pyjlink using pip 
+
 # Use
 Currently on works on Linux - adding windows support is simple 
 
@@ -32,3 +38,5 @@ Compile: ninja
 Clean: ninja clean
 
 Flash using Jlink: ninja flash
+
+Reconfigure: ninja reconfigure 

@@ -24,7 +24,14 @@ link_deps = []
 # find external programs from path (OS independant)
 size = find_program('arm-none-eabi-size')
 objcopy = find_program('arm-none-eabi-objcopy')
-JLinkprog = find_program('JLinkExe', required : false)
+
+# message('Build machine system: ' + build_machine.system())
+if build_machine.system() == 'linux'
+  JLinkprog = find_program('JLinkExe', required : false)
+elif build_machine.system() == 'windows'
+  JLinkprog = find_program('Jlink', required : false)
+endif 
+
 pyLinkprog = find_program('pylink', required : false)
 
 # retrieve properties from cross compile file
@@ -39,7 +46,8 @@ endif
 #  '-DSTM32H743xx',
 #]
 
-linkerfile = files('src/custom.ld')
+linkerfile = files('src/app_demo_dp_blinky_Debug.ld')
+# linkerfile = files('src/custom.ld')
 # startupfile = files('src/startup_nhs3152.s')
 
 # add defines to the c_args

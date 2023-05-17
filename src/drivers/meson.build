@@ -20,7 +20,11 @@ drivers_src = files(
   'nss/lib_chip_nss/src/wwdt_nss.c',
   'nss/mods/led/led.c',
   'nss/mods/startup/startup.c',
-  'nss/mods/ndeft2t/ndeft2t.c'
+  'nss/mods/ndeft2t/ndeft2t.c',
+  'rtt/SEGGER_RTT_Conf.h',
+  'rtt/SEGGER_RTT_printf.c',
+  'rtt/SEGGER_RTT.c',
+  'rtt/SEGGER_RTT.h'
 
 
 )

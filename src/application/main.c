@@ -3,6 +3,7 @@
 
 #include "board.h"
 #include "ndeft2t/ndeft2t.h"
+#include "SEGGER_RTT.h"
 
 /* ------------------------------------------------------------------------- */
 
@@ -163,22 +164,110 @@ void setDAC(int value) {
 
 /* ------------------------------------------------------------------------- */
 
+static void Master_Init(void)
+{
+    if (SYSTEMCLOCK == NSS_SFRO_FREQUENCY) {
+        Chip_Flash_SetHighPowerMode(true);
+    }
+    Chip_Clock_System_SetClockFreq(SYSTEMCLOCK);
+    Board_Init();
+
+    Chip_IOCON_SetPinConfig(NSS_IOCON, IOCON_PIO0_4, IOCON_FUNC_1 | IOCON_I2CMODE_STDFAST);
+    Chip_IOCON_SetPinConfig(NSS_IOCON, IOCON_PIO0_5, IOCON_FUNC_1 | IOCON_I2CMODE_STDFAST);
+
+    Chip_SysCon_Peripheral_DeassertReset(SYSCON_PERIPHERAL_RESET_I2C0);
+
+    Chip_I2C_Init(I2C0);
+    Chip_I2C_SetClockRate(I2C0, I2C_BITRATE);
+
+    /* Finish initialization for master I2C communication. */
+    Chip_I2C_SetMasterEventHandler(I2C0, Chip_I2C_EventHandler);
+    NVIC_EnableIRQ(I2C0_IRQn);
+
+    /* Extra initialization required for master-build functionality:
+     * - prepare NDEF message creation
+     * - Use pin 3 for i2c pull-up - assuming R3 and R4 are stuffed.
+     */
+    NDEFT2T_Init();
+    Chip_IOCON_SetPinConfig(NSS_IOCON, IOCON_PIO0_3, IOCON_FUNC_0);
+    Chip_GPIO_SetPinDIROutput(NSS_GPIO, 0, 3);
+    Chip_GPIO_SetPinOutHigh(NSS_GPIO, 0, 3);
+}
+
+int main(void)
+{
+    Master_Init();
+
+    Chip_Clock_System_BusyWait_ms(1000); // Might not be need: to stop bricking
+
+    SEGGER_RTT_ConfigUpBuffer(0, NULL, NULL, 0, SEGGER_RTT_MODE_NO_BLOCK_SKIP);
+
+    //SEGGER_RTT_WriteString(0, "SEGGER Real-Time-Terminal Sample\r\n\r\n");
+    //SEGGER_RTT_WriteString(0, "###### Testing SEGGER_printf() ######\r\n");
+
+    uint16_t offset = 0;
+    uint8_t text[I2C_SLAVE_TX_SIZE + 1];
+    // I2C_STATUS_T i2c_status = 0;
+    // I2C_XFER_T i2cPacket;
+
+    while(1)
+    {   SEGGER_RTT_WriteString(0, "Scanning i2c Address\r\n");
+        for(uint8_t i = 0; i < 128; i++)
+        {
+            I2C_XFER_T i2cPacket = {.slaveAddr = i,
+                    .txBuff = (uint8_t *)&offset,
+                    .txSz = I2C_MASTER_TX_SIZE,
+                    .rxBuff = text,
+                    .rxSz = I2C_SLAVE_TX_SIZE};
+            I2C_STATUS_T i2c_status = Chip_I2C_MasterTransfer(I2C0, &i2cPacket);
+
+            SEGGER_RTT_printf(0, "Address: %d: ", i);
+            if(i2c_status == 0)
+            {
+                SEGGER_RTT_printf(0, "AWK\n", i);
+            }
+            else
+            {
+                SEGGER_RTT_printf(0, "NAK\n", i);
+            }
+            Chip_Clock_System_BusyWait_ms(10);
+        }
+
+        SEGGER_RTT_WriteString(0, "Scanning Complete\r\n");
+        Chip_Clock_System_BusyWait_ms(2000);
+    }
+
+
+    return 0;
+}
+
+/*
 int main(void)
 {
     Board_Init();
 
     Chip_Clock_System_BusyWait_ms(1000); // Might not be need: to stop bricking
 
+    while (1) {
+        LED_Toggle(LED_RED);
+        Chip_Clock_System_BusyWait_ms(250);
+    }
+
     NDEFT2T_Init();
-    NVIC_EnableIRQ(PIO0_IRQn); /* PIO0_IRQHandler is called when this interrupt fires. */
+    NVIC_EnableIRQ(PIO0_IRQn); // PIO0_IRQHandler is called when this interrupt fires. 
     Chip_GPIO_EnableInt(NSS_GPIO, 0, 1);
     initDAC();
 
+    Chip_Clock_System_BusyWait_ms(1000);
+
+
+
+
     for (;;) {
-        if (sFieldPresent) { /* Update the NDEF message once when there is an NFC field */
+        if (sFieldPresent) { // Update the NDEF message once when there is an NFC field 
 
             GenerateNdef_TextMime();
-            /* Update the payloads for the next message. */
+            // Update the payloads for the next message.
             // sText[0] = (uint8_t)((sText[0] == '9') ? '0' : (sText[0] + 1));
             // sBytes[0]++;
         
@@ -193,4 +282,4 @@ int main(void)
     }
 
     return 0;
-}
+}*/

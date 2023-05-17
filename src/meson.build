@@ -5,6 +5,7 @@ project_inc = [
   include_directories('drivers/nss/mods'),
   include_directories('drivers/include'),
   include_directories('drivers/include/NXP'),
+  include_directories('drivers/rtt'),
   # include_directories('drivers/nss/lib_board_dp/mods'),
 ]
 

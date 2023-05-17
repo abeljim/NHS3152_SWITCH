@@ -14,6 +14,13 @@
 
 #define LED_COUNT 1
 
+#define I2CBBM_DEFAULT_I2C_ADDRESS I2C_SLAVE_ADDRESS
+#define I2CBBM_SYSTEM_CLOCK_DIVIDER 16 /* SysClock @ 500 kHz */
+#define SYSTEMCLOCK 1000000
+#define I2C_BITRATE 100000
+#define I2C_SLAVE_TX_SIZE 180
+#define I2C_MASTER_TX_SIZE 2
+
 /**
  * The LED properties for the supported LEDs of the Demo PCB.
  * @see LED_PROPERTIES_T
