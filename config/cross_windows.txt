@@ -12,7 +12,6 @@ c_args = [
     '-DCORE_M0PLUS', 
     '-Og',
     '-g3',
-    '-pedantic',
     '-Wall',
     '-Wextra',
     '-Wconversion',

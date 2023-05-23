@@ -1,6 +1,8 @@
 {
     "mesonbuild.configureOnOpen": false,
     "files.associations": {
-        "adcdac_nss.h": "c"
-    }
+        "adcdac_nss.h": "c",
+        "ndeft2t.h": "c"
+    },
+    "C_Cpp.default.compileCommands": "builddir\\vscode_compile_commands.json"
 }

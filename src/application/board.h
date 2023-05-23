@@ -13,6 +13,7 @@
 #define __BOARD_H_
 
 #define LED_COUNT 1
+#define CORE_M0PLUS
 
 #define I2CBBM_DEFAULT_I2C_ADDRESS I2C_SLAVE_ADDRESS
 #define I2CBBM_SYSTEM_CLOCK_DIVIDER 16 /* SysClock @ 500 kHz */

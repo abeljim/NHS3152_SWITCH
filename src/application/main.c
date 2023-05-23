@@ -4,6 +4,7 @@
 #include "board.h"
 #include "ndeft2t/ndeft2t.h"
 #include "SEGGER_RTT.h"
+#include "adxl343.h"
 
 /* ------------------------------------------------------------------------- */
 
@@ -164,6 +165,17 @@ void setDAC(int value) {
 
 /* ------------------------------------------------------------------------- */
 
+/** Called under interrupt. */
+void I2C0_IRQHandler(void)
+{
+    if (Chip_I2C_IsMasterActive(I2C0)) {
+        Chip_I2C_MasterStateHandler(I2C0);
+    }
+    else {
+        Chip_I2C_SlaveStateHandler(I2C0);
+    }
+}
+
 static void Master_Init(void)
 {
     if (SYSTEMCLOCK == NSS_SFRO_FREQUENCY) {
@@ -194,7 +206,7 @@ static void Master_Init(void)
     Chip_GPIO_SetPinOutHigh(NSS_GPIO, 0, 3);
 }
 
-int main(void)
+uint8_t scanI2C()
 {
     Master_Init();
 
@@ -209,32 +221,65 @@ int main(void)
     uint8_t text[I2C_SLAVE_TX_SIZE + 1];
     // I2C_STATUS_T i2c_status = 0;
     // I2C_XFER_T i2cPacket;
-
+    I2C_XFER_T i2cPacket = {.slaveAddr = 0,
+            .txBuff = (uint8_t *)&offset,
+            .txSz = I2C_MASTER_TX_SIZE,
+            .rxBuff = text,
+            .rxSz = I2C_SLAVE_TX_SIZE};
     while(1)
     {   SEGGER_RTT_WriteString(0, "Scanning i2c Address\r\n");
         for(uint8_t i = 0; i < 128; i++)
         {
-            I2C_XFER_T i2cPacket = {.slaveAddr = i,
-                    .txBuff = (uint8_t *)&offset,
-                    .txSz = I2C_MASTER_TX_SIZE,
-                    .rxBuff = text,
-                    .rxSz = I2C_SLAVE_TX_SIZE};
+            i2cPacket.slaveAddr = i;            
             I2C_STATUS_T i2c_status = Chip_I2C_MasterTransfer(I2C0, &i2cPacket);
 
-            SEGGER_RTT_printf(0, "Address: %d: ", i);
+            
             if(i2c_status == 0)
             {
+                SEGGER_RTT_printf(0, "Address: %d: ", i);
                 SEGGER_RTT_printf(0, "AWK\n", i);
             }
-            else
-            {
-                SEGGER_RTT_printf(0, "NAK\n", i);
-            }
+
             Chip_Clock_System_BusyWait_ms(10);
         }
 
         SEGGER_RTT_WriteString(0, "Scanning Complete\r\n");
         Chip_Clock_System_BusyWait_ms(2000);
+    }
+
+
+    return 0;    
+}
+
+int main(void)
+{
+    Master_Init();
+
+    Chip_Clock_System_BusyWait_ms(1000); // Might not be need: to stop bricking
+
+    SEGGER_RTT_ConfigUpBuffer(0, NULL, NULL, 0, SEGGER_RTT_MODE_NO_BLOCK_SKIP);
+
+    SEGGER_RTT_printf(0, "Program Started\n");
+
+    if(!adxl343_begin())
+    {
+        SEGGER_RTT_printf(0, "Failed ADXL343 INIT\n");
+        return 0;
+    }
+
+    SEGGER_RTT_printf(0, "SUCCESS ADXL343 INIT\n");
+
+    while(1)
+    {   
+        int16_t x, y, z;
+        if(adxl343_getXYZ(&x, &y, &z))
+        {
+            SEGGER_RTT_printf(0, "ACCEL: %d, %d, %d\n", x, y, z);
+        }
+        else {
+            SEGGER_RTT_printf(0, "Bad DATA\n");
+        }
+        Chip_Clock_System_BusyWait_ms(100);
     }
 
 
